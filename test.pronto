@@ -1,0 +1,7 @@
+a+b
+a£c
+
+
+if a > b and a is not b {
+	log "hi"
+}

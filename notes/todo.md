@@ -1,0 +1,6 @@
+- [ ] Lexer
+  - [x] Define Basic Tokens
+  - [ ] Generate Tokens
+- [ ] Parser
+- [ ] Emmiter
+- [ ] VM
