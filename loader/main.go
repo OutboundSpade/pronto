@@ -1,4 +1,4 @@
-package fileloader
+package loader
 
 import "io/ioutil"
 
