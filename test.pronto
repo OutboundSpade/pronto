@@ -6,7 +6,18 @@ tell john that I said 69 asdasnajsncjn
 a+b
 //a£c
 a+b
-if a > b and a is not b/*{*/
+if a > b and a is not b {
 	log hi
-//}
+}
+a = 5
+name = John
+func sayHello str name, num age {
+
+}
+sayHello "John", 30
+num b = 11233
+obj c = {
+	str name
+	
+}
 a+1

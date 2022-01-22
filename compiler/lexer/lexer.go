@@ -6,46 +6,6 @@ import (
 	"regexp"
 )
 
-const (
-	// Math Operators
-	T_PLUS = iota
-	T_MINUS
-	T_MULT
-	T_DIV
-
-	//Binary Operators
-	T_AND //&&
-	T_OR  //||
-	T_IS  //Equivilent to == in other languages
-	T_GT
-	T_GT_EQ
-	T_LT
-	T_LT_EQ
-
-	//Keywords
-	T_IF
-	T_FOR
-	T_IN
-	T_FROM
-
-	//Number
-	T_NUM
-	T_IDENT
-
-	//Other/General
-	T_NEWLN
-	T_PAREN_L
-	T_PAREN_R
-	T_EQ
-	T_UNKNOWN
-)
-
-type Token struct {
-	Code  int64
-	Value string
-	Name  string
-}
-
 func Tokenize(code *string) []Token {
 	tokens := []Token{}
 	runes := []rune(*code)
@@ -59,31 +19,40 @@ func Tokenize(code *string) []Token {
 		case '\r':
 			continue
 		case '\n':
-			tokens = append(tokens, Token{T_NEWLN, "", `NEWLINE`})
+			tokens = append(tokens, Token{T_NEWLN, "", `\n`})
 			continue
 		case '+':
-			tokens = append(tokens, Token{T_PLUS, "", "PLUS"})
+			tokens = append(tokens, Token{T_PLUS, "", "+"})
 			continue
 		case '-':
-			tokens = append(tokens, Token{T_MINUS, "", "MINUS"})
+			tokens = append(tokens, Token{T_MINUS, "", "-"})
 			continue
 		case '*':
-			tokens = append(tokens, Token{T_MULT, "", "MULT"})
+			tokens = append(tokens, Token{T_MULT, "", "*"})
 			continue
 		// case '/':
 		// 	tokens = append(tokens, Token{T_DIV, "", "DIV"})
 		// 	continue
+		case '=':
+			tokens = append(tokens, Token{T_EQ, "", "="})
+			continue
 		case '(':
-			tokens = append(tokens, Token{T_PAREN_L, "", "L_PAREN"})
+			tokens = append(tokens, Token{T_PAREN_L, "", "("})
 			continue
 		case ')':
-			tokens = append(tokens, Token{T_PAREN_R, "", "R_PAREN"})
+			tokens = append(tokens, Token{T_PAREN_R, "", ")"})
 			continue
+		case '{':
+			tokens = append(tokens, Token{T_CURL_L, "", "{"})
+			continue
+		// case '}':
+		// 	tokens = append(tokens, Token{T_CURL_R, "", "}"})
+		// 	continue
 		case '>':
-			tokens = append(tokens, Token{T_GT, "", "GREATER_TN"})
+			tokens = append(tokens, Token{T_GT, "", ">"})
 			continue
 		case '<':
-			tokens = append(tokens, Token{T_LT, "", "LESS_TN"})
+			tokens = append(tokens, Token{T_LT, "", "<"})
 			continue
 
 		}
@@ -91,14 +60,23 @@ func Tokenize(code *string) []Token {
 		if len(t) > 0 {
 			// log.Printf("WORD %v", t)
 			if isComment(t) {
-				l, c := traceLocFromIndex(&runes, skipComment(&runes, cCounter))
-				log.Printf(`comment: %v endloc: %d,%d`, t, l, c)
+				// l, c := traceLocFromIndex(&runes, skipComment(&runes, cCounter))
+				// log.Printf(`comment: %v endloc: %d,%d`, t, l, c)
 				cCounter = skipComment(&runes, cCounter)
 				continue
 			}
 			if isNumber(t) {
-				tokens = append(tokens, Token{T_NUM, t, "NUMBER"})
+				tokens = append(tokens, Token{T_NUM_LIT, t, "NUMBER"})
 				// log.Printf("Num: '%v'", t)
+				cCounter += len(t) - 1
+				continue
+			}
+			if isKeyTerm(t) {
+				switch t {
+				case "if":
+
+				}
+				log.Printf("KeyTerm: '%v'", t)
 				cCounter += len(t) - 1
 				continue
 			}
@@ -110,13 +88,14 @@ func Tokenize(code *string) []Token {
 			}
 		}
 		if runes[cCounter] == '/' {
-			tokens = append(tokens, Token{T_DIV, "", "DIV"})
+			tokens = append(tokens, Token{T_DIV, "", "/"})
 			continue
 		}
 
 		if t == "" {
 			t = string(runes[cCounter])
 		}
+		tokens = append(tokens, Token{T_UNKNOWN, t, "UNKNOWN"})
 		unexpectedToken(&Token{T_UNKNOWN, t, ""}, &runes, cCounter)
 	}
 	return tokens

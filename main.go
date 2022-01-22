@@ -1,19 +1,31 @@
 package main
 
 import (
+	"flag"
+	"fmt"
 	"log"
+	"os"
 
 	"github.com/OutboundSpade/pronto/compiler"
 	fileloader "github.com/OutboundSpade/pronto/loader"
 )
 
 func main() {
-	var code string = string(*fileloader.Load("test.pronto"))
+	flag.Parse()
+	if flag.NArg() == 0 {
+		flag.Usage()
+		os.Exit(1)
+	}
+
+	fpath := flag.Arg(0)
+
+	var code string = string(*fileloader.Load(fpath))
 	log.SetFlags(log.Lshortfile)
 
-	log.Println(code)
+	fmt.Println(code)
 	tokens := compiler.Tokenize(&code)
+	// fmt.Printf("tokens: %v\n", tokens)
 	for _, token := range tokens {
-		log.Printf("%v: %v", token.Name, token.Value)
+		fmt.Printf("%v", token.Name, token.Value)
 	}
 }
